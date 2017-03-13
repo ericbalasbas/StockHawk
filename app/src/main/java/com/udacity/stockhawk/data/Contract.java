@@ -39,6 +39,8 @@ public final class Contract {
                 COLUMN_PERCENTAGE_CHANGE,
                 COLUMN_HISTORY
         );
+        // sort order for details view
+        public static final String HISTORY_SORT_ORDER = COLUMN_HISTORY + " DESC";
         static final String TABLE_NAME = "quotes";
 
         public static Uri makeUriForStock(String symbol) {

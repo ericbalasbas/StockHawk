@@ -1,10 +1,12 @@
 package com.udacity.stockhawk.ui;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -34,19 +36,25 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     private static final int STOCK_LOADER = 0;
     @SuppressWarnings("WeakerAccess")
-    @BindView(R.id.recycler_view)
-    RecyclerView stockRecyclerView;
+    @BindView(R.id.recycler_view) RecyclerView stockRecyclerView;
     @SuppressWarnings("WeakerAccess")
-    @BindView(R.id.swipe_refresh)
-    SwipeRefreshLayout swipeRefreshLayout;
+    @BindView(R.id.swipe_refresh) SwipeRefreshLayout swipeRefreshLayout;
     @SuppressWarnings("WeakerAccess")
-    @BindView(R.id.error)
-    TextView error;
+    @BindView(R.id.error) TextView error;
     private StockAdapter adapter;
 
     @Override
     public void onClick(String symbol) {
         Timber.d("Symbol clicked: %s", symbol);
+        // TODO: Load detail screen, construct URI
+        // launch intent
+        Intent intent = new Intent(this, DetailActivity.class)
+                            .setData(Contract.Quote.makeUriForStock(symbol));
+        // .putExtra("SYMBOL", symbol)
+
+        Context context = this;
+
+        ActivityCompat.startActivity(context, intent, null);
     }
 
     @Override
@@ -130,6 +138,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             QuoteSyncJob.syncImmediately(this);
         }
     }
+
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {

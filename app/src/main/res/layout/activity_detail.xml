@@ -1,0 +1,35 @@
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/detail_scroll_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Stock name, symbol
+          Current price
+          price change (percentage change) -->
+    <!-- horizontal for testing
+         Use ListView for testing? ListAdapter?
+    -->
+    <LinearLayout
+        android:id="@+id/detail_linear_layout"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/stock_symbol"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/stock_price"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/stock_history"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+</ScrollView>

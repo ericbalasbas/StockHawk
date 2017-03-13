@@ -75,7 +75,7 @@ public final class QuoteSyncJob {
 
                 Stock stock = quotes.get(symbol);
 
-                // NOTE: stock does not equal NULL on missing stocks
+                // NOTE: stock does not always equal NULL on missing stocks
                 // "RRRREEEWWWWWWW" returns "RRRREEEWWWWWWW: null"
                 // "ATT" returns null
                 if (stock == null || stock.toString().contains(": null")) {
