@@ -69,6 +69,7 @@ public final class QuoteSyncJob {
             Timber.d(quotes.toString());
 
             ArrayList<ContentValues> quoteCVs = new ArrayList<>();
+            ArrayList<ContentValues> historicalQuoteCVs = new ArrayList<>();
 
             while (iterator.hasNext()) {
                 String symbol = iterator.next();
@@ -76,11 +77,11 @@ public final class QuoteSyncJob {
                 Stock stock = quotes.get(symbol);
 
                 // NOTE: stock does not always equal NULL on missing stocks
-                // "RRRREEEWWWWWWW" returns "RRRREEEWWWWWWW: null"
+                // symbol "RRRREEEWWWWWWW" returns "RRRREEEWWWWWWW: null"
                 // "ATT" returns null
                 if (stock == null || stock.toString().contains(": null")) {
-                    // if stock does not exist remove stock from SharedPreference
-                    // Show toast with error messsage
+                    // If stock does not exist remove stock from SharedPreference
+                    // Show toast with error message
                     // https://discussions.udacity.com/t/app-crashes-when-i-close-the-app-due-to-localbraodcastmanager/211521/5
                     new Handler(Looper.getMainLooper()).post(new Runnable() {
                         @Override
@@ -88,9 +89,10 @@ public final class QuoteSyncJob {
                             showToast(context);
                         }
                     });
+
                     // Remove stock from SharedPreferences if it does not exist
                     PrefUtils.removeStock(context, symbol);
-                    break;
+                    continue;
                 }
 
                 StockQuote quote = stock.getQuote();
@@ -103,14 +105,24 @@ public final class QuoteSyncJob {
                 // The request will hang forever X_x
                 List<HistoricalQuote> history = stock.getHistory(from, to, Interval.WEEKLY);
 
-                StringBuilder historyBuilder = new StringBuilder();
-
+                // TODO: change to use HISTORICAL_QUOTE table, high, low, open, close
                 for (HistoricalQuote it : history) {
-                    historyBuilder.append(it.getDate().getTimeInMillis());
-                    historyBuilder.append(", ");
-                    historyBuilder.append(it.getClose());
-                    historyBuilder.append("\n");
+                    ContentValues historicalQuoteCV = new ContentValues();
+                    historicalQuoteCV.put(Contract.HistoricalQuote.COLUMN_SYMBOL, symbol);
+                    historicalQuoteCV.put(Contract.HistoricalQuote.COLUMN_DATE, it.getDate().getTimeInMillis());
+                    historicalQuoteCV.put(Contract.HistoricalQuote.COLUMN_HIGH, it.getHigh().floatValue());
+                    historicalQuoteCV.put(Contract.HistoricalQuote.COLUMN_LOW, it.getLow().floatValue());
+                    historicalQuoteCV.put(Contract.HistoricalQuote.COLUMN_OPEN, it.getOpen().floatValue());
+                    historicalQuoteCV.put(Contract.HistoricalQuote.COLUMN_CLOSE, it.getClose().floatValue());
+
+                    historicalQuoteCVs.add(historicalQuoteCV);
                 }
+
+                // TODO: move to after for loop, bulk insert for each symbol
+                context.getContentResolver()
+                    .bulkInsert(
+                            Contract.HistoricalQuote.URI,
+                            historicalQuoteCVs.toArray(new ContentValues[historicalQuoteCVs.size()]));
 
                 ContentValues quoteCV = new ContentValues();
                 quoteCV.put(Contract.Quote.COLUMN_SYMBOL, symbol);
@@ -118,15 +130,18 @@ public final class QuoteSyncJob {
                 quoteCV.put(Contract.Quote.COLUMN_PERCENTAGE_CHANGE, percentChange);
                 quoteCV.put(Contract.Quote.COLUMN_ABSOLUTE_CHANGE, change);
 
-                quoteCV.put(Contract.Quote.COLUMN_HISTORY, historyBuilder.toString());
-
                 quoteCVs.add(quoteCV);
+
             }
 
             context.getContentResolver()
                     .bulkInsert(
                             Contract.Quote.URI,
                             quoteCVs.toArray(new ContentValues[quoteCVs.size()]));
+
+
+
+            // TODO: add bulkInsert for HistoricalQuote here
 
             Intent dataUpdatedIntent = new Intent(ACTION_DATA_UPDATED);
             context.sendBroadcast(dataUpdatedIntent);
@@ -156,10 +171,8 @@ public final class QuoteSyncJob {
 
 
     public static synchronized void initialize(final Context context) {
-
         schedulePeriodic(context);
         syncImmediately(context);
-
     }
 
     public static synchronized void syncImmediately(Context context) {
@@ -184,6 +197,4 @@ public final class QuoteSyncJob {
 
         }
     }
-
-
 }

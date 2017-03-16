@@ -27,11 +27,16 @@ import timber.log.Timber;
 public class DetailActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>{
 
     private static final int STOCK_DETAILS_LOADER = 0;
+    private static final int STOCK_HISTORY_LOADER = 1;
     private Uri StockQuery;
     // @BindView(R.id.detail_scroll_view) ScrollingView ScrollView;
     @BindView(R.id.stock_symbol) TextView StockSymbol;
     @BindView(R.id.stock_price) TextView StockPrice;
-    @BindView(R.id.stock_history) TextView StockHistory;
+    @BindView(R.id.stock_history_date) TextView StockHistoryDate;
+    @BindView(R.id.stock_open) TextView StockHistoryOpen;
+    @BindView(R.id.stock_close) TextView StockHistoryClose;
+    @BindView(R.id.stock_high) TextView StockHistoryHigh;
+    @BindView(R.id.stock_low) TextView StockHistoryLow;
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,7 +47,9 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         StockQuery = getIntent().getData();
 
         getSupportLoaderManager().initLoader(STOCK_DETAILS_LOADER, null, this);
+        getSupportLoaderManager().initLoader(STOCK_HISTORY_LOADER, null, this);
         Timber.d(StockQuery.toString());
+        // content://com.udacity.stockhawk/quote/FB
         Timber.d("initLoader");
     }
 
@@ -50,10 +57,30 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
 
     @Override public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         Timber.d("onCreateLoader");
-        return new CursorLoader(this,
-                StockQuery,
-                Contract.Quote.QUOTE_COLUMNS.toArray(new String[]{}),
-                null, null, Contract.Quote.HISTORY_SORT_ORDER);
+
+        Loader<Cursor> returnLoader = null;
+
+        switch (id) {
+            case STOCK_DETAILS_LOADER:
+                returnLoader = new CursorLoader(this,
+                        StockQuery,
+                        Contract.Quote.QUOTE_COLUMNS.toArray(new String[]{}),
+                        null, null, null);
+                break;
+
+            case STOCK_HISTORY_LOADER:
+                // TODO: change query URI to use HistoricalQuote table
+                returnLoader =  new CursorLoader(this,
+                        Contract.HistoricalQuote.makeUriForStock(
+                                Contract.Quote.getStockFromUri(StockQuery)),
+                        Contract.HistoricalQuote.HISTORICAL_QUOTE_COLUMNS.toArray(new String[]{}),
+                        null, null, null);
+                break;
+            default:
+                throw new UnsupportedOperationException("Unknown Loader ID:" + Integer.toString(id));
+        }
+
+        return returnLoader;
 
     }
 
@@ -62,21 +89,56 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
 //            error.setVisibility(View.GONE);
 //        }
 
-        data.moveToFirst();
+        switch (loader.getId()) {
+            case STOCK_DETAILS_LOADER:
+                data.moveToFirst();
+
+                // get stock symbol
+                StockSymbol.setText(data.getString(Contract.Quote.POSITION_SYMBOL));
+                StockSymbol.invalidate();
+
+                // get current price
+                StockPrice.setText(data.getString(Contract.Quote.POSITION_PRICE));
+                StockPrice.invalidate();
+
+                break;
+
+            case STOCK_HISTORY_LOADER:
+                data.moveToFirst();
+
+                break;
+
+            default:
+                throw new UnsupportedOperationException("Unknown Loader ID:" + Integer.toString(loader.getId()));
+        }
+
+
 
         Timber.d("onLoadFinished");
 
-        // get stock symbol
-        StockSymbol.setText(data.getString(Contract.Quote.POSITION_SYMBOL));
-        StockSymbol.invalidate();
+        // load stock history into chart data
+        // while(data.hasNext())
+        // e = data.next();
+//        03-13 18:14:45.334 2490-2490/com.udacity.stockhawk D/DetailActivity: 1488776400000, 138.789993
+//        1488171600000, 137.169998
+//        1487653200000, 135.440002
+//        1486962000000, 133.529999
+//        1486357200000, 134.190002
 
-        // get current price
-        StockPrice.setText(data.getString(Contract.Quote.POSITION_PRICE));
-        StockPrice.invalidate();
+        // java.lang.UnsupportedOperationException: Unknown URI:content://com.udacity.stockhawk/historical_quote%2F*
+        // at com.udacity.stockhawk.data.StockProvider.insert(StockProvider.java:128)
+
+        // in QuoteSyncJob.java
+//        for (HistoricalQuote it : history) {
+//            historyBuilder.append(it.getDate().getTimeInMillis());
+
+
 
         // get stock history
-        StockHistory.setText(data.getString(Contract.Quote.POSITION_HISTORY));
-        StockHistory.invalidate();
+//        StockHistory.setText(data.getString(Contract.Quote.POSITION_HISTORY));
+//        StockHistory.invalidate();
+//
+//        Timber.d(data.getString(Contract.Quote.POSITION_HISTORY));
 
     }
 

@@ -50,7 +50,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         // launch intent
         Intent intent = new Intent(this, DetailActivity.class)
                             .setData(Contract.Quote.makeUriForStock(symbol));
-        // .putExtra("SYMBOL", symbol)
 
         Context context = this;
 

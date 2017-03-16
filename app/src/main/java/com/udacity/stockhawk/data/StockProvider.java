@@ -15,15 +15,20 @@ public class StockProvider extends ContentProvider {
 
     private static final int QUOTE = 100;
     private static final int QUOTE_FOR_SYMBOL = 101;
+    private static final int HISTORICAL_QUOTE = 102;
 
     private static final UriMatcher uriMatcher = buildUriMatcher();
 
     private DbHelper dbHelper;
 
+    //TODO: ***** make sure PATH_HISTORICAL_QUOTE matches
+    // content://com.udacity.stockhawk/historical_quote/GOOG
     private static UriMatcher buildUriMatcher() {
         UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
         matcher.addURI(Contract.AUTHORITY, Contract.PATH_QUOTE, QUOTE);
         matcher.addURI(Contract.AUTHORITY, Contract.PATH_QUOTE_WITH_SYMBOL, QUOTE_FOR_SYMBOL);
+        matcher.addURI(Contract.AUTHORITY, Contract.PATH_HISTORICAL_QUOTE, HISTORICAL_QUOTE);
+        matcher.addURI(Contract.AUTHORITY, Contract.PATH_HISTORICAL_QUOTE + "/*", HISTORICAL_QUOTE);
         return matcher;
     }
 
@@ -63,8 +68,21 @@ public class StockProvider extends ContentProvider {
                         null,
                         sortOrder
                 );
+                break;
+
+            case HISTORICAL_QUOTE:
+                returnCursor = db.query(
+                        Contract.HistoricalQuote.TABLE_NAME,
+                        projection,
+                        Contract.HistoricalQuote.COLUMN_SYMBOL + " = ?",
+                        new String[]{Contract.HistoricalQuote.getStockFromUri(uri)},
+                        null,
+                        null,
+                        sortOrder
+                );
 
                 break;
+            // TODO: case HISTORICAL_QUOTE
             default:
                 throw new UnsupportedOperationException("Unknown URI:" + uri);
         }
@@ -93,6 +111,16 @@ public class StockProvider extends ContentProvider {
             case QUOTE:
                 db.insert(
                         Contract.Quote.TABLE_NAME,
+                        null,
+                        values
+                );
+                returnUri = Contract.Quote.URI;
+                break;
+
+            // TODO: case HISTORICAL_QUOTE
+            case HISTORICAL_QUOTE:
+                db.insert(
+                        Contract.HistoricalQuote.TABLE_NAME,
                         null,
                         values
                 );
@@ -136,6 +164,16 @@ public class StockProvider extends ContentProvider {
                         selectionArgs
                 );
                 break;
+
+            case HISTORICAL_QUOTE:
+                String hq_symbol = Contract.HistoricalQuote.getStockFromUri(uri);
+                rowsDeleted = db.delete(
+                        Contract.HistoricalQuote.TABLE_NAME,
+                        '"' + hq_symbol + '"' + " =" + Contract.HistoricalQuote.COLUMN_SYMBOL,
+                        selectionArgs
+                );
+                break;
+            // TODO: Add HISTORICAL_QUOTE
             default:
                 throw new UnsupportedOperationException("Unknown URI:" + uri);
         }
@@ -160,10 +198,13 @@ public class StockProvider extends ContentProvider {
 
         final SQLiteDatabase db = dbHelper.getWritableDatabase();
 
+        int returnCount = 0;
+        Context context = getContext();
+
         switch (uriMatcher.match(uri)) {
             case QUOTE:
                 db.beginTransaction();
-                int returnCount = 0;
+
                 try {
                     for (ContentValues value : values) {
                         db.insert(
@@ -177,12 +218,35 @@ public class StockProvider extends ContentProvider {
                     db.endTransaction();
                 }
 
-                Context context = getContext();
+
                 if (context != null) {
                     context.getContentResolver().notifyChange(uri, null);
                 }
 
                 return returnCount;
+
+            case HISTORICAL_QUOTE:
+                db.beginTransaction();
+
+                try {
+                    for (ContentValues value : values) {
+                        db.insert(
+                                Contract.HistoricalQuote.TABLE_NAME,
+                                null,
+                                value
+                        );
+                    }
+                    db.setTransactionSuccessful();
+                } finally {
+                    db.endTransaction();
+                }
+
+                if (context != null) {
+                    context.getContentResolver().notifyChange(uri, null);
+                }
+
+                return returnCount;
+            // TODO:  case HISTORICAL_QUOTE
             default:
                 return super.bulkInsert(uri, values);
         }

@@ -27,7 +27,27 @@
             android:layout_height="wrap_content" />
 
         <TextView
-            android:id="@+id/stock_history"
+            android:id="@+id/stock_history_date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/stock_open"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/stock_close"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/stock_high"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/stock_low"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
     </LinearLayout>
