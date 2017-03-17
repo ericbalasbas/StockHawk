@@ -9,10 +9,15 @@ import android.support.v4.content.Loader;
 import android.support.v4.view.ScrollingView;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.udacity.stockhawk.R;
 import com.udacity.stockhawk.data.Contract;
+
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -30,13 +35,21 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
     private static final int STOCK_HISTORY_LOADER = 1;
     private Uri StockQuery;
     // @BindView(R.id.detail_scroll_view) ScrollingView ScrollView;
+    // @BindView(R.id.detail_linear_layout) LinearLayout LinearLayoutView;
     @BindView(R.id.stock_symbol) TextView StockSymbol;
     @BindView(R.id.stock_price) TextView StockPrice;
+    @BindView(R.id.price_change_absolute) TextView PriceChangeAbsolute;
+    @BindView(R.id.price_change_percent) TextView PriceChangePercent;
     @BindView(R.id.stock_history_date) TextView StockHistoryDate;
     @BindView(R.id.stock_open) TextView StockHistoryOpen;
     @BindView(R.id.stock_close) TextView StockHistoryClose;
     @BindView(R.id.stock_high) TextView StockHistoryHigh;
     @BindView(R.id.stock_low) TextView StockHistoryLow;
+
+    private DecimalFormat dollarFormatWithPlus;
+    private DecimalFormat dollarFormat;
+    private DecimalFormat percentageFormat;
+
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,6 +61,16 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
 
         getSupportLoaderManager().initLoader(STOCK_DETAILS_LOADER, null, this);
         getSupportLoaderManager().initLoader(STOCK_HISTORY_LOADER, null, this);
+
+
+        dollarFormat = (DecimalFormat) NumberFormat.getCurrencyInstance(Locale.US);
+        dollarFormatWithPlus = (DecimalFormat) NumberFormat.getCurrencyInstance(Locale.US);
+        dollarFormatWithPlus.setPositivePrefix("+$");
+        percentageFormat = (DecimalFormat) NumberFormat.getPercentInstance(Locale.getDefault());
+        percentageFormat.setMaximumFractionDigits(2);
+        percentageFormat.setMinimumFractionDigits(2);
+        percentageFormat.setPositivePrefix("+");
+
         Timber.d(StockQuery.toString());
         // content://com.udacity.stockhawk/quote/FB
         Timber.d("initLoader");
@@ -98,13 +121,34 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
                 StockSymbol.invalidate();
 
                 // get current price
-                StockPrice.setText(data.getString(Contract.Quote.POSITION_PRICE));
+                StockPrice.setText(dollarFormat.format(data.getFloat(Contract.Quote.POSITION_PRICE)));
                 StockPrice.invalidate();
+
+                float rawAbsoluteChange = data.getFloat(Contract.Quote.POSITION_ABSOLUTE_CHANGE);
+                float percentageChange = data.getFloat(Contract.Quote.POSITION_PERCENTAGE_CHANGE);
+
+                if (rawAbsoluteChange > 0) {
+                    PriceChangeAbsolute.setBackgroundResource(R.drawable.percent_change_pill_green);
+                    PriceChangePercent.setBackgroundResource(R.drawable.percent_change_pill_green);
+                } else {
+                    PriceChangeAbsolute.setBackgroundResource(R.drawable.percent_change_pill_red);
+                    PriceChangePercent.setBackgroundResource(R.drawable.percent_change_pill_red);
+                }
+
+                String change = dollarFormatWithPlus.format(rawAbsoluteChange);
+                String percentage = percentageFormat.format(percentageChange / 100);
+
+                PriceChangeAbsolute.setText(change);
+
+                PriceChangePercent.setText(percentage);
 
                 break;
 
             case STOCK_HISTORY_LOADER:
                 data.moveToFirst();
+
+                StockHistoryDate.setText(data.getString(Contract.HistoricalQuote.POSITION_DATE));
+                StockHistoryDate.invalidate();
 
                 break;
 

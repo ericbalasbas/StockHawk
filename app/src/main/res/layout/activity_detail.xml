@@ -27,6 +27,16 @@
             android:layout_height="wrap_content" />
 
         <TextView
+            android:id="@+id/price_change_absolute"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/price_change_percent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
             android:id="@+id/stock_history_date"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
