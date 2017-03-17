@@ -12,11 +12,17 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
 import com.udacity.stockhawk.R;
 import com.udacity.stockhawk.data.Contract;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import butterknife.BindView;
@@ -45,6 +51,7 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
     @BindView(R.id.stock_close) TextView StockHistoryClose;
     @BindView(R.id.stock_high) TextView StockHistoryHigh;
     @BindView(R.id.stock_low) TextView StockHistoryLow;
+    @BindView(R.id.history_chart) LineChart HistoryChart;
 
     private DecimalFormat dollarFormatWithPlus;
     private DecimalFormat dollarFormat;
@@ -116,11 +123,9 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
             case STOCK_DETAILS_LOADER:
                 data.moveToFirst();
 
-                // get stock symbol
                 StockSymbol.setText(data.getString(Contract.Quote.POSITION_SYMBOL));
                 StockSymbol.invalidate();
 
-                // get current price
                 StockPrice.setText(dollarFormat.format(data.getFloat(Contract.Quote.POSITION_PRICE)));
                 StockPrice.invalidate();
 
@@ -139,7 +144,6 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
                 String percentage = percentageFormat.format(percentageChange / 100);
 
                 PriceChangeAbsolute.setText(change);
-
                 PriceChangePercent.setText(percentage);
 
                 break;
@@ -149,6 +153,18 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
 
                 StockHistoryDate.setText(data.getString(Contract.HistoricalQuote.POSITION_DATE));
                 StockHistoryDate.invalidate();
+
+                List<Entry> entries = new ArrayList<Entry>();
+                float[] valuesX = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+                float[] valuesY = {10, 20, 30, 40, 50, 60, 70, 80, 90, 100};
+                for (int i=0 ; i< valuesX.length ; i++) {
+                    entries.add(new Entry(valuesX[i], valuesY[i]));
+                }
+
+                LineDataSet dataSet = new LineDataSet(entries, "Label"); // add entries to dataset
+                LineData lineData = new LineData(dataSet);
+                HistoryChart.setData(lineData);
+                HistoryChart.invalidate();
 
                 break;
 
@@ -178,19 +194,10 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
 
 
 
-        // get stock history
-//        StockHistory.setText(data.getString(Contract.Quote.POSITION_HISTORY));
-//        StockHistory.invalidate();
-//
-//        Timber.d(data.getString(Contract.Quote.POSITION_HISTORY));
-
     }
 
 
-    @Override public void onLoaderReset(Loader<Cursor> loader) {
-        // swipeRefreshLayout.setRefreshing(false);
-        // StockHistory.close();
-    }
+    @Override public void onLoaderReset(Loader<Cursor> loader) { }
 
     @Override protected void onResume() {
         super.onResume();
