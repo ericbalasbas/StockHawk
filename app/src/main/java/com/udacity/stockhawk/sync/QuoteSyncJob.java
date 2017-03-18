@@ -23,6 +23,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 
 import timber.log.Timber;
 import yahoofinance.Stock;
@@ -46,6 +47,9 @@ public final class QuoteSyncJob {
     static void getQuotes(final Context context) {
 
         Timber.d("Running sync job");
+
+        // https://discussions.udacity.com/t/parsing-csv-line-spam-on-logcat-on-project-3/227635/3
+        YahooFinance.logger.setLevel(Level.OFF); // turn off YahooFinance log messages
 
         Calendar from = Calendar.getInstance();
         Calendar to = Calendar.getInstance();

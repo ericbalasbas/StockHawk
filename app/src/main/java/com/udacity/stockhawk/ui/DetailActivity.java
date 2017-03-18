@@ -13,9 +13,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.AxisBase;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.udacity.stockhawk.R;
 import com.udacity.stockhawk.data.Contract;
 
@@ -69,7 +73,6 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         getSupportLoaderManager().initLoader(STOCK_DETAILS_LOADER, null, this);
         getSupportLoaderManager().initLoader(STOCK_HISTORY_LOADER, null, this);
 
-
         dollarFormat = (DecimalFormat) NumberFormat.getCurrencyInstance(Locale.US);
         dollarFormatWithPlus = (DecimalFormat) NumberFormat.getCurrencyInstance(Locale.US);
         dollarFormatWithPlus.setPositivePrefix("+$");
@@ -80,10 +83,9 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
 
         Timber.d(StockQuery.toString());
         // content://com.udacity.stockhawk/quote/FB
-        Timber.d("initLoader");
+        // Timber.d("initLoader");
     }
 
-    // ??? how to set min and max axis values?
 
     @Override public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         Timber.d("onCreateLoader");
@@ -104,7 +106,7 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
                         Contract.HistoricalQuote.makeUriForStock(
                                 Contract.Quote.getStockFromUri(StockQuery)),
                         Contract.HistoricalQuote.HISTORICAL_QUOTE_COLUMNS.toArray(new String[]{}),
-                        null, null, null);
+                        null, null, Contract.HistoricalQuote.HISTORY_SORT_ORDER);
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown Loader ID:" + Integer.toString(id));
@@ -115,6 +117,7 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
     }
 
     @Override public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        // TODO: Handle case where no records found
 //        if (data.getCount() != 0) {
 //            error.setVisibility(View.GONE);
 //        }
@@ -149,21 +152,53 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
                 break;
 
             case STOCK_HISTORY_LOADER:
+                int count = data.getCount();
+                String[] dateArray = new String[count];
+
                 data.moveToFirst();
 
-                StockHistoryDate.setText(data.getString(Contract.HistoricalQuote.POSITION_DATE));
-                StockHistoryDate.invalidate();
+//                long dateLong = data.getLong(Contract.HistoricalQuote.POSITION_DATE);
+//
+//                String dateString = Contract.HistoricalQuote.getStringFromDate(dateLong);
+//                StockHistoryDate.setText(dateString);
+//                StockHistoryDate.invalidate();
+
+
+
+                // try finally, cursor.close
+                // load stock history into chart data
 
                 List<Entry> entries = new ArrayList<Entry>();
-                float[] valuesX = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-                float[] valuesY = {10, 20, 30, 40, 50, 60, 70, 80, 90, 100};
-                for (int i=0 ; i< valuesX.length ; i++) {
-                    entries.add(new Entry(valuesX[i], valuesY[i]));
+
+                int i = 0;
+                while (data.moveToNext()){
+
+                    long dateLong = data.getLong(Contract.HistoricalQuote.POSITION_DATE);
+                    String dateString = Contract.HistoricalQuote.getStringFromDate(dateLong);
+
+                    float closingPrice = data.getFloat(Contract.HistoricalQuote.POSITION_CLOSE);
+                    dateArray[i] = dateString;
+
+                    entries.add(new Entry(i, closingPrice));
+
+                    i = i + 1;
                 }
+
+//                float[] valuesX = {10, 15, 20, 25, 30, 35, 40, 45, 50, 55};
+//                float[] valuesY = {10, 20, 30, 40, 50, 60, 70, 80, 90, 100};
+//                for (int i=0 ; i< valuesX.length ; i++) {
+//                    entries.add(new Entry(valuesX[i], valuesY[i]));
+//                }
 
                 LineDataSet dataSet = new LineDataSet(entries, "Label"); // add entries to dataset
                 LineData lineData = new LineData(dataSet);
                 HistoryChart.setData(lineData);
+//                YAxis yAxis = HistoryChart.getAxisLeft();
+//                yAxis.setAxisMinimum(0f); // start at zero
+//                yAxis.setAxisMaximum(100f); // the axis maximum is 100
+                XAxis xAxis = HistoryChart.getXAxis();
+                xAxis.setValueFormatter(new DateValueFormatter(dateArray));
+
                 HistoryChart.invalidate();
 
                 break;
@@ -173,33 +208,36 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         }
 
 
-
         Timber.d("onLoadFinished");
 
         // load stock history into chart data
         // while(data.hasNext())
         // e = data.next();
-//        03-13 18:14:45.334 2490-2490/com.udacity.stockhawk D/DetailActivity: 1488776400000, 138.789993
-//        1488171600000, 137.169998
-//        1487653200000, 135.440002
-//        1486962000000, 133.529999
-//        1486357200000, 134.190002
-
-        // java.lang.UnsupportedOperationException: Unknown URI:content://com.udacity.stockhawk/historical_quote%2F*
-        // at com.udacity.stockhawk.data.StockProvider.insert(StockProvider.java:128)
-
-        // in QuoteSyncJob.java
-//        for (HistoricalQuote it : history) {
-//            historyBuilder.append(it.getDate().getTimeInMillis());
 
 
 
     }
 
-
     @Override public void onLoaderReset(Loader<Cursor> loader) { }
 
     @Override protected void onResume() {
         super.onResume();
+    }
+
+
+    // https://discussions.udacity.com/t/mpandroidchart-using-dates-on-x-axis/216615
+    public class DateValueFormatter implements IAxisValueFormatter {
+
+        private String[] mValues;
+
+        public DateValueFormatter(String[] values) {
+            this.mValues = values;
+        }
+
+        @Override
+        public String getFormattedValue(float value, AxisBase axis) {
+            // "value" represents the position of the label on the axis (x or y)
+            return mValues[(int) value];
+        }
     }
 }
