@@ -6,7 +6,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/widget"
     android:layout_width="match_parent"
-    android:layout_height="500dp"
+    android:layout_height="match_parent"
     android:layout_weight="1"
     android:background="@color/colorPrimary">
     <ListView
@@ -15,7 +15,8 @@
         android:layout_height="match_parent"
         android:divider="@null"
         android:dividerHeight="0dp"
-        tools:listitem="@layout/widget_list_item"/>
+        tools:listitem="@layout/widget_list_item"
+        android:layout_gravity="top"/>
     <TextView
         android:id="@+id/widget_empty"
         android:layout_width="match_parent"

@@ -57,7 +57,6 @@ class StockRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
                                         AppWidgetManager.INVALID_APPWIDGET_ID);
     }
 
-    // ??????? why is this never called ?????????
     // https://developer.android.com/guide/topics/appwidgets/index.html#fresh
     // see Keeping Data Fresh on RemoteViewsFactory lifecycle
     public void onCreate() {
@@ -72,19 +71,9 @@ class StockRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
         Timber.d("onCreate");
     }
 
-    // 03-24 10:35:10.466 2606-2619/com.udacity.stockhawk E/AndroidRuntime: FATAL EXCEPTION: Binder:2606_2
-// Process: com.udacity.stockhawk, PID: 2606
-// java.lang.SecurityException: Permission Denial: reading com.udacity.stockhawk.data.StockProvider
-// uri content://com.udacity.stockhawk/quote from pid=2045, uid=10014 requires the provider be
-// exported, or grantUriPermission()
-// at android.widget.RemoteViewsService$RemoteViewsFactoryAdapter.onDataSetChanged 78
 
     // http://stackoverflow.com/questions/13187284/android-permission-denial-in-widget-remoteviewsfactory-for-content
 
-    // app no longer crashes here, but widget is still blank
-
-//    03-24 11:44:55.863 28236-28236/com.udacity.stockhawk D/WidgetProvider: android.appwidget.action.APPWIDGET_UPDATE_OPTIONS
-//03-24 11:44:55.880 28236-28248/com.udacity.stockhawk D/StockRemoteViewsFactory: content://com.udacity.stockhawk/quote
     @Override
     public void onDataSetChanged() {
 
@@ -97,6 +86,7 @@ class StockRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 
             ContentResolver resolver = mContext.getContentResolver();
 
+            // TODO: Add sort order
             String[] projection = Contract.Quote.QUOTE_COLUMNS.toArray(new String[] {});
             cursor = resolver.query(Contract.Quote.URI, projection, null, null, null);
 
@@ -162,27 +152,13 @@ class StockRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 
         Timber.d("getViewAt: price: " + dollarFormat.format(price));
 
-//        03-24 13:56:20.137 27179-27191/com.udacity.stockhawk E/AndroidRuntime: FATAL EXCEPTION: Binder:27179_1
-//        Process: com.udacity.stockhawk, PID: 27179
-//        java.lang.NullPointerException: Attempt to invoke virtual method 'void android.widget.TextView.setText(java.lang.CharSequence)' on a null object reference
-//        at com.udacity.stockhawk.widget.StockRemoteViewsFactory.getViewAt(WidgetRemoteViewsService.java:155)
-
-        // line 155
-//        StockSymbolView.setText(symbol);
-//        PriceView.setText(dollarFormat.format(price));
-//        StockSymbolView.invalidate();
-//        PriceView.invalidate();
-
-
         // Change remoteView background
         // http://stackoverflow.com/questions/6333774/change-remoteview-imageview-background
         if (rawAbsoluteChange > 0) {
             views.setInt(R.id.widget_change, "setBackgroundResource", R.drawable.percent_change_pill_green);
             Timber.d("getViewAt: setBackgroundResource: green");
-//            PriceChangeView.setBackgroundResource(R.drawable.percent_change_pill_green);
         } else {
             views.setInt(R.id.widget_change, "setBackgroundResource", R.drawable.percent_change_pill_red);
-//            PriceChangeView.setBackgroundResource(R.drawable.percent_change_pill_red);
             Timber.d("getViewAt: setBackgroundResource: red");
         }
 
@@ -192,28 +168,24 @@ class StockRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
         if (PrefUtils.getDisplayMode(mContext).equals(mContext.getString(R.string.pref_display_mode_absolute_key))) {
             views.setTextViewText(R.id.widget_change, change);
             Timber.d("getViewAt: absolute");
-//            PriceChangeView.setText(change);
         } else {
             views.setTextViewText(R.id.widget_change, percentage);
             Timber.d("getViewAt: percentage");
-//            PriceChangeView.setText(percentage);
         }
 
-        // views.apply() ????
-
         // set up Intent and views.setOnClickFillInIntent(); here ????
-        // https://developer.android.com/guide/topics/appwidgets/index.html
+        // https://developer.android.com/guide/topics/appwidgets/index.html#implementing_collections
         // Setting the fill-in Intent
         // Your RemoteViewsFactory must set a fill-in intent on each item in the collection.
         // This makes it possible to distinguish the individual on-click action of a given item.
         // The fill-in intent is then combined with the PendingIntent template in order to determine
         // the final intent that will be executed when the item is clicked.
 
-        // Intent fillInIntent = new Intent();
-        // fillInIntent.putExtra("stock", symbol);
+         Intent fillInIntent = new Intent();
+         fillInIntent.putExtra("stock", symbol);
         // Make it possible to distinguish the individual on-click
         // action of a given item
-        // views.setOnClickFillInIntent(R.id.widget_list_item, fillInIntent);
+         views.setOnClickFillInIntent(R.id.widget_list_item, fillInIntent);
 
         return views;
     }
@@ -230,9 +202,6 @@ class StockRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
     // getLoadingView must be implemented
     @Override
     public RemoteViews getLoadingView() {
-        Timber.d("getLoadingView");
-        // TODO: Fix when loadingView returns a view, getViewAt is never called
-        //return new RemoteViews(mContext.getPackageName(), R.id.widget_empty);
         return null;
     }
 
@@ -244,16 +213,12 @@ class StockRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 
     @Override
     public long getItemId(int position) {
-        Timber.d("getItemId");
-        // ??? if (cursor.moveToPosition(position) {
-        // return cursor.getLong(Contract.Quote.POSITION_ID);
-        // } else
         return position;
     }
 
     @Override
     public boolean hasStableIds() {
-        return false; // true ???
+        return false;
     }
 }
 

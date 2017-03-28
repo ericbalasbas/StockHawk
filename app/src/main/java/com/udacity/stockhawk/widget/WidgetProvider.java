@@ -57,17 +57,12 @@ public class WidgetProvider extends AppWidgetProvider {
 //            } else {
 //                setRemoteAdapterV11(context, views);
 //            }
-//            boolean useDetailActivity = context.getResources()
-//                    .getBoolean(R.bool.use_detail_activity);
-//            Intent clickIntentTemplate = useDetailActivity
-//                    ? new Intent(context, DetailActivity.class)
-//                    : new Intent(context, MainActivity.class);
-            // TODO: ?????????????????
-//            Intent clickIntentTemplate = new Intent(context, MainActivity.class);
-//            PendingIntent clickPendingIntentTemplate = TaskStackBuilder.create(context)
-//                    .addNextIntentWithParentStack(clickIntentTemplate)
-//                    .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
-//            views.setPendingIntentTemplate(R.id.widget_list, clickPendingIntentTemplate);
+
+            Intent clickIntentTemplate = new Intent(context, MainActivity.class);
+            PendingIntent clickPendingIntentTemplate = TaskStackBuilder.create(context)
+                    .addNextIntentWithParentStack(clickIntentTemplate)
+                    .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+            views.setPendingIntentTemplate(R.id.widget_list, clickPendingIntentTemplate);
             views.setEmptyView(R.id.widget_list, R.id.widget_empty);
 
             // Tell the AppWidgetManager to perform an update on the current app widget
@@ -76,7 +71,6 @@ public class WidgetProvider extends AppWidgetProvider {
         super.onUpdate(context, appWidgetManager, appWidgetIds);
     }
 
-    // TODO: Fix SyncAdapter usage here
     // TODO: remove dependency on QuoteSyncJob???
     // android.appwidget.action.APPWIDGET_ENABLED
     // D/WidgetProvider: android.appwidget.action.APPWIDGET_UPDATE
