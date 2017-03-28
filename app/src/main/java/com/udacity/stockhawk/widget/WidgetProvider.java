@@ -32,24 +32,10 @@ public class WidgetProvider extends AppWidgetProvider {
     // configuration is done.
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
 
-
-        // TODO: Test widget_list and check intent values here
         // Perform this loop procedure for each App Widget that belongs to this provider
         for (int appWidgetId : appWidgetIds) {
-
             Timber.d("onUpdate: " + Integer.toString(appWidgetId));
             RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget);
-
-            // Create an Intent to launch MainActivity
-//            Intent intent = new Intent(context, MainActivity.class);
-//            intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-//            intent.setData(Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)));
-//
-//            PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
-            // https://developer.android.com/reference/android/widget/RemoteViews.html#setOnClickPendingIntent(int, android.app.PendingIntent)
-            // setting on click action of items in collections will not work with setOnClickPendingIntent
-            // use setPendingIntentTemplate instead
-            // views.setOnClickPendingIntent(R.id.widget, pendingIntent);
 
             // Set up the collection
 //            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
@@ -57,6 +43,10 @@ public class WidgetProvider extends AppWidgetProvider {
 //            } else {
 //                setRemoteAdapterV11(context, views);
 //            }
+
+    // https://developer.android.com/reference/android/widget/RemoteViews.html#setOnClickPendingIntent(int, android.app.PendingIntent)
+    // setting on click action of items in collections will not work with setOnClickPendingIntent
+    // use setPendingIntentTemplate instead
 
             Intent clickIntentTemplate = new Intent(context, MainActivity.class);
             PendingIntent clickPendingIntentTemplate = TaskStackBuilder.create(context)
@@ -73,7 +63,6 @@ public class WidgetProvider extends AppWidgetProvider {
 
     // TODO: remove dependency on QuoteSyncJob???
     // android.appwidget.action.APPWIDGET_ENABLED
-    // D/WidgetProvider: android.appwidget.action.APPWIDGET_UPDATE
 
     // https://developer.android.com/guide/topics/appwidgets/index.html
     // This is called for every broadcast and before each of the above callback methods.

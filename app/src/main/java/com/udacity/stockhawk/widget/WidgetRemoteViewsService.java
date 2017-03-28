@@ -124,8 +124,6 @@ class StockRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
         Timber.d("getViewAt: position: " + Integer.toString(position));
 
         // TODO: Return null if cursor is null, try catch?
-        // why is there an invisible widget?
-        // why is getViewAt only called for first widget list item???
         if (cursor != null) {
             cursor.moveToPosition(position);
         } else {

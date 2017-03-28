@@ -51,10 +51,6 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
     @BindView(R.id.price_change_absolute) TextView PriceChangeAbsolute;
     @BindView(R.id.price_change_percent) TextView PriceChangePercent;
     @BindView(R.id.stock_history_date) TextView StockHistoryDate;
-    @BindView(R.id.stock_open) TextView StockHistoryOpen;
-    @BindView(R.id.stock_close) TextView StockHistoryClose;
-    @BindView(R.id.stock_high) TextView StockHistoryHigh;
-    @BindView(R.id.stock_low) TextView StockHistoryLow;
     @BindView(R.id.history_chart) LineChart HistoryChart;
 
     private DecimalFormat dollarFormatWithPlus;
