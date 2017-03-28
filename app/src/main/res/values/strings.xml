@@ -37,4 +37,7 @@
 
     <string name="title_activity_detail">Details</string>
 
+    <string name="title_widget">Stocks</string>
+    <string name="empty_stock_list">You have not chosen any stocks</string>
+
 </resources>

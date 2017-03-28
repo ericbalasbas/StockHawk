@@ -73,6 +73,8 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         getSupportLoaderManager().initLoader(STOCK_DETAILS_LOADER, null, this);
         getSupportLoaderManager().initLoader(STOCK_HISTORY_LOADER, null, this);
 
+
+        // TODO: Set up formats in utility class
         dollarFormat = (DecimalFormat) NumberFormat.getCurrencyInstance(Locale.US);
         dollarFormatWithPlus = (DecimalFormat) NumberFormat.getCurrencyInstance(Locale.US);
         dollarFormatWithPlus.setPositivePrefix("+$");
@@ -171,7 +173,7 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
                 List<Entry> entries = new ArrayList<Entry>();
 
                 int i = 0;
-                while (data.moveToNext()){
+                while (data.moveToNext()) {
 
                     long dateLong = data.getLong(Contract.HistoricalQuote.POSITION_DATE);
                     String dateString = Contract.HistoricalQuote.getStringFromDate(dateLong);
@@ -209,12 +211,6 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
 
 
         Timber.d("onLoadFinished");
-
-        // load stock history into chart data
-        // while(data.hasNext())
-        // e = data.next();
-
-
 
     }
 
