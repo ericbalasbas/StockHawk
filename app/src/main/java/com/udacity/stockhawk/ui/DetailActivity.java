@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.AxisBase;
+import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
@@ -162,7 +163,6 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
 //                StockHistoryDate.invalidate();
 
 
-
                 // try finally, cursor.close
                 // load stock history into chart data
 
@@ -182,20 +182,19 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
                     i = i + 1;
                 }
 
-//                float[] valuesX = {10, 15, 20, 25, 30, 35, 40, 45, 50, 55};
-//                float[] valuesY = {10, 20, 30, 40, 50, 60, 70, 80, 90, 100};
-//                for (int i=0 ; i< valuesX.length ; i++) {
-//                    entries.add(new Entry(valuesX[i], valuesY[i]));
-//                }
 
-                LineDataSet dataSet = new LineDataSet(entries, "Label"); // add entries to dataset
+                LineDataSet dataSet = new LineDataSet(entries, "Closing Price"); // add entries to dataset
+                dataSet.setColor(R.color.material_blue_500);
+                dataSet.setCircleColor(R.color.material_blue_500);
                 LineData lineData = new LineData(dataSet);
                 HistoryChart.setData(lineData);
-//                YAxis yAxis = HistoryChart.getAxisLeft();
-//                yAxis.setAxisMinimum(0f); // start at zero
-//                yAxis.setAxisMaximum(100f); // the axis maximum is 100
+
                 XAxis xAxis = HistoryChart.getXAxis();
                 xAxis.setValueFormatter(new DateValueFormatter(dateArray));
+
+                Description description = new Description();
+                description.setText("");
+                HistoryChart.setDescription(description);
 
                 HistoryChart.invalidate();
 

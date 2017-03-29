@@ -4,12 +4,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Stock name, symbol
-          Current price
-          price change (percentage change) -->
-    <!-- horizontal for testing
-         Use ListView for testing? ListAdapter?
-    -->
     <LinearLayout
         android:id="@+id/detail_layout"
         android:layout_width="match_parent"
