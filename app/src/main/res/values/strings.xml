@@ -18,6 +18,9 @@
     <string name="default_stocks_microsoft" translatable="false">MSFT</string>
     <string name="default_stocks_facebook" translatable="false">FB</string>
 
+    <string name="default_price" translatable="false">100.00</string>
+    <string name="default_percent" translatable="false">10.00</string>
+
 
     <string name="action_change_units" translatable="false">@string/pref_display_mode_key</string>
 
