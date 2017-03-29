@@ -65,7 +65,6 @@ public class WidgetProvider extends AppWidgetProvider {
         super.onUpdate(context, appWidgetManager, appWidgetIds);
     }
 
-    // TODO: remove dependency on QuoteSyncJob???
     // android.appwidget.action.APPWIDGET_ENABLED
 
     // https://developer.android.com/guide/topics/appwidgets/index.html

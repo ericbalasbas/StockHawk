@@ -80,7 +80,6 @@ class StockRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 
             ContentResolver resolver = mContext.getContentResolver();
 
-            // TODO: Add sort order
             String[] projection = Contract.Quote.QUOTE_COLUMNS.toArray(new String[] {});
             cursor = resolver.query(Contract.Quote.URI, projection, null, null, null);
 
