@@ -81,7 +81,7 @@ public final class Contract {
                 COLUMN_CLOSE
         );
 
-        // TODO: sort order for details view
+
         public static final String HISTORY_SORT_ORDER = COLUMN_DATE + " ASC";
 
         static final String TABLE_NAME = "historical_quotes";
@@ -94,20 +94,25 @@ public final class Contract {
             return queryUri.getLastPathSegment();
         }
 
-        // TODO: Document date column, and how it is stored/transformed
-        // TODO: Place date utility functions here? Date long to string
 
-        // http://stackoverflow.com/questions/7487460/java-convert-long-to-date
-        // Date d = new Date(TimeUnit.SECONDS.toMillis(1220227200L));
-
-        // https://discussions.udacity.com/t/how-to-store-only-date-in-database/216360/7
-        // SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        // String date = dateFormat.format(it.getDate().getTime());
-
-        // in QuoteSyncJob.java
-//        for (HistoricalQuote it : history) {
-//            historyBuilder.append(it.getDate().getTimeInMillis());
-
+        /**
+         *
+         * @param dateLong date as Long
+         * @return date as String
+         *
+         * http://stackoverflow.com/questions/7487460/java-convert-long-to-date
+         * Date d = new Date(TimeUnit.SECONDS.toMillis(1220227200L));
+         *
+         * https://discussions.udacity.com/t/how-to-store-only-date-in-database/216360/7
+         *
+         * SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+         * String date = dateFormat.format(it.getDate().getTime());
+         *
+         * in QuoteSyncJob.java
+         *
+         * for (HistoricalQuote it : history) {
+         *     historyBuilder.append(it.getDate().getTimeInMillis());
+         */
         public static String getStringFromDate(long dateLong) {
             Date d = new Date(dateLong);
 

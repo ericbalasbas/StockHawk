@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- xmlns:tools="http://schemas.android.com/tools" -->
+
+<!--
+  ~ Copyright (c) 2017. Eric Balasbas
+  -->
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/widget_list_item"
     android:layout_width="match_parent"

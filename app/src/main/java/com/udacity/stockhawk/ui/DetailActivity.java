@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2017. Eric Balasbas
+ */
+
 package com.udacity.stockhawk.ui;
 
 import android.database.Cursor;
@@ -6,17 +10,13 @@ import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v4.view.ScrollingView;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
@@ -34,10 +34,11 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import timber.log.Timber;
 
+
 /**
  * Created by eric on 3/9/2017.
  *
- * show 2 years of past weekly price history
+ * Stock detail activity shows 2 years of past weekly price history
  */
 
 public class DetailActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>{
@@ -45,8 +46,7 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
     private static final int STOCK_DETAILS_LOADER = 0;
     private static final int STOCK_HISTORY_LOADER = 1;
     private Uri StockQuery;
-    // @BindView(R.id.detail_scroll_view) ScrollingView ScrollView;
-    // @BindView(R.id.detail_linear_layout) LinearLayout LinearLayoutView;
+
     @BindView(R.id.stock_symbol) TextView StockSymbol;
     @BindView(R.id.stock_price) TextView StockPrice;
     @BindView(R.id.price_change_absolute) TextView PriceChangeAbsolute;
@@ -70,8 +70,6 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         getSupportLoaderManager().initLoader(STOCK_DETAILS_LOADER, null, this);
         getSupportLoaderManager().initLoader(STOCK_HISTORY_LOADER, null, this);
 
-
-        // TODO: Set up formats in utility class
         dollarFormat = (DecimalFormat) NumberFormat.getCurrencyInstance(Locale.US);
         dollarFormatWithPlus = (DecimalFormat) NumberFormat.getCurrencyInstance(Locale.US);
         dollarFormatWithPlus.setPositivePrefix("+$");
@@ -80,9 +78,6 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         percentageFormat.setMinimumFractionDigits(2);
         percentageFormat.setPositivePrefix("+");
 
-        Timber.d(StockQuery.toString());
-        // content://com.udacity.stockhawk/quote/FB
-        // Timber.d("initLoader");
     }
 
 
@@ -100,7 +95,6 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
                 break;
 
             case STOCK_HISTORY_LOADER:
-                // TODO: change query URI to use HistoricalQuote table
                 returnLoader =  new CursorLoader(this,
                         Contract.HistoricalQuote.makeUriForStock(
                                 Contract.Quote.getStockFromUri(StockQuery)),
@@ -110,16 +104,10 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
             default:
                 throw new UnsupportedOperationException("Unknown Loader ID:" + Integer.toString(id));
         }
-
         return returnLoader;
-
     }
 
     @Override public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        // TODO: Handle case where no records found
-//        if (data.getCount() != 0) {
-//            error.setVisibility(View.GONE);
-//        }
 
         switch (loader.getId()) {
             case STOCK_DETAILS_LOADER:
@@ -155,16 +143,6 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
                 String[] dateArray = new String[count];
 
                 data.moveToFirst();
-
-//                long dateLong = data.getLong(Contract.HistoricalQuote.POSITION_DATE);
-//
-//                String dateString = Contract.HistoricalQuote.getStringFromDate(dateLong);
-//                StockHistoryDate.setText(dateString);
-//                StockHistoryDate.invalidate();
-
-
-                // try finally, cursor.close
-                // load stock history into chart data
 
                 List<Entry> entries = new ArrayList<Entry>();
 
@@ -217,11 +195,15 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
 
 
     // https://discussions.udacity.com/t/mpandroidchart-using-dates-on-x-axis/216615
-    public class DateValueFormatter implements IAxisValueFormatter {
+
+    /**
+     * Format dates as strings for Line Chart
+     */
+    private class DateValueFormatter implements IAxisValueFormatter {
 
         private String[] mValues;
 
-        public DateValueFormatter(String[] values) {
+        DateValueFormatter(String[] values) {
             this.mValues = values;
         }
 

@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<!-- setting layout_height to 0 for FrameLayout will hide content
 
+<!--
+  ~ Copyright (c) 2017. Eric Balasbas
+  -->
 
--->
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"

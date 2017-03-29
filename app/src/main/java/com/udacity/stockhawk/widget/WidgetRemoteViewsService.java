@@ -1,18 +1,17 @@
+/*
+ * Copyright (c) 2017. Eric Balasbas
+ */
+
 package com.udacity.stockhawk.widget;
 
-import android.annotation.TargetApi;
 import android.appwidget.AppWidgetManager;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Binder;
-import android.os.Build;
-import android.os.Bundle;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
-import android.widget.TextView;
 
 import com.udacity.stockhawk.R;
 import com.udacity.stockhawk.data.Contract;
@@ -22,11 +21,9 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Locale;
 
-import butterknife.BindView;
 import timber.log.Timber;
 
 
-// @TargetApi(Build.VERSION_CODES.HONEYCOMB)
 public class WidgetRemoteViewsService extends RemoteViewsService {
 
 
@@ -47,9 +44,6 @@ class StockRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
     private DecimalFormat dollarFormat;
     private DecimalFormat percentageFormat;
 
-//    @BindView(R.id.widget_symbol) TextView StockSymbolView;
-//    @BindView(R.id.widget_price) TextView PriceView;
-//    @BindView(R.id.widget_change) TextView PriceChangeView;
 
     StockRemoteViewsFactory(Context context, Intent intent) {
         mContext = context;
@@ -123,7 +117,6 @@ class StockRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 
         Timber.d("getViewAt: position: " + Integer.toString(position));
 
-        // TODO: Return null if cursor is null, try catch?
         if (cursor != null) {
             cursor.moveToPosition(position);
         } else {
@@ -171,7 +164,6 @@ class StockRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
             Timber.d("getViewAt: percentage");
         }
 
-        // set up Intent and views.setOnClickFillInIntent(); here ????
         // https://developer.android.com/guide/topics/appwidgets/index.html#implementing_collections
         // Setting the fill-in Intent
         // Your RemoteViewsFactory must set a fill-in intent on each item in the collection.
@@ -188,15 +180,9 @@ class StockRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
         return views;
     }
 
-    // @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1)
-//            private void setRemoteContentDescription(RemoteViews views, String description) {
-//                views.setContentDescription(R.id.widget_icon, description);
-//            }
-//
 
     // https://developer.android.com/reference/android/widget/RemoteViewsService.RemoteViewsFactory.html#getLoadingView()
     // This allows for the use of a custom loading view which appears between the time that getViewAt(int) is called and returns. If null is returned, a default loading view will be used.
-    // If new view returned, then getViewAt is not called.
     // getLoadingView must be implemented
     @Override
     public RemoteViews getLoadingView() {

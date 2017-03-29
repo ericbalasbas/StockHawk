@@ -109,11 +109,6 @@ public final class QuoteSyncJob {
                 // The request will hang forever X_x
                 List<HistoricalQuote> history = stock.getHistory(from, to, Interval.WEEKLY);
 
-                // TODO: change to use HISTORICAL_QUOTE table, high, low, open, close
-                // TODO: document date type here. SQLite has no date type, can store dates as
-                //       strings or integers
-                // include link on how to convert integer to date
-                // time zone???
                 for (HistoricalQuote it : history) {
                     ContentValues historicalQuoteCV = new ContentValues();
                     historicalQuoteCV.put(Contract.HistoricalQuote.COLUMN_SYMBOL, symbol);
@@ -126,8 +121,6 @@ public final class QuoteSyncJob {
                     historicalQuoteCVs.add(historicalQuoteCV);
                 }
 
-                // TODO: add bulkInsert for HistoricalQuote here
-                // TODO: move to after for loop, bulk insert for each symbol
                 context.getContentResolver()
                     .bulkInsert(
                             Contract.HistoricalQuote.URI,
@@ -150,9 +143,6 @@ public final class QuoteSyncJob {
 
 
             Intent dataUpdatedIntent = new Intent(ACTION_DATA_UPDATED);
-            // Setting the package ensures that only components in our app will receive the broadcast
-//            Intent dataUpdatedIntent = new Intent(ACTION_DATA_UPDATED)
-//                                            .setPackage(context.getPackageName());
             context.sendBroadcast(dataUpdatedIntent);
 
         } catch (IOException exception) {

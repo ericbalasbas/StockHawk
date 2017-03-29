@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2017. Eric Balasbas
+ */
+
 package com.udacity.stockhawk.widget;
 
 import android.annotation.TargetApi;

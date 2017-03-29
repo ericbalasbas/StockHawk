@@ -21,8 +21,6 @@ public class StockProvider extends ContentProvider {
 
     private DbHelper dbHelper;
 
-    //TODO: ***** make sure PATH_HISTORICAL_QUOTE matches
-    // content://com.udacity.stockhawk/historical_quote/GOOG
     private static UriMatcher buildUriMatcher() {
         UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
         matcher.addURI(Contract.AUTHORITY, Contract.PATH_QUOTE, QUOTE);
@@ -82,7 +80,7 @@ public class StockProvider extends ContentProvider {
                 );
 
                 break;
-            // TODO: case HISTORICAL_QUOTE
+
             default:
                 throw new UnsupportedOperationException("Unknown URI:" + uri);
         }
@@ -117,7 +115,6 @@ public class StockProvider extends ContentProvider {
                 returnUri = Contract.Quote.URI;
                 break;
 
-            // TODO: case HISTORICAL_QUOTE
             case HISTORICAL_QUOTE:
                 db.insert(
                         Contract.HistoricalQuote.TABLE_NAME,
@@ -173,7 +170,7 @@ public class StockProvider extends ContentProvider {
                         selectionArgs
                 );
                 break;
-            // TODO: Add HISTORICAL_QUOTE
+
             default:
                 throw new UnsupportedOperationException("Unknown URI:" + uri);
         }
@@ -246,7 +243,7 @@ public class StockProvider extends ContentProvider {
                 }
 
                 return returnCount;
-            // TODO:  case HISTORICAL_QUOTE
+
             default:
                 return super.bulkInsert(uri, values);
         }
